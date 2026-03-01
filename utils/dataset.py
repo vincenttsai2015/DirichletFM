@@ -11,34 +11,62 @@ class BinaryMNIST(torch.utils.data.Dataset):
     """
     Binarized MNIST dataset.
     """
-    data_url = 'http://www.cs.toronto.edu/~larocheh/public/datasets/binarized_mnist/binarized_mnist_{}.amat'
+    data_url = "http://www.cs.toronto.edu/~larocheh/public/datasets/binarized_mnist/binarized_mnist_{}.amat"
 
-    def __init__(self, root, split, transform=None):
+    def __init__(self, root, split, with_labels=True, 
+                 labels_root='data/MNIST', val_from_train=5000):
         super().__init__()
         self.root = root
         self.split = split
-        self.transform = transform
-        self.alphabet_size = 10
+        self.alphabet_size = 2
         self.num_cls = 10
 
-        data_path = os.path.join(self.root, f'binarized_mnist_{split}.amat')
-        if not os.path.exists(self.root):
-            os.makedirs(self.root, exist_ok=True)
-        if not os.path.exists(data_path):
-            print(f'Downloading {split} set...')
-            urlretrieve(self.data_url.format(split), data_path)
-        self.data = torch.from_numpy(np.loadtxt(data_path).astype(np.float32))
-        print(self.data.shape)
+        os.makedirs(root, exist_ok=True)
+        path = os.path.join(root, f"binarized_mnist_{split}.amat")
+        if not os.path.exists(path):
+            print(f"Downloading {split} set...")
+            urlretrieve(self.data_url.format(split), path)
 
-    def __getitem__(self, index):
-        x = self.data[index]
-        x = torch.stack([x, 1 - x], dim=-1)
-        if self.transform is not None:
-            x = self.transform(x)
-        return (x,)
+        # data: float32 0/1, shape (N, 784)
+        data = np.loadtxt(path).astype(np.float32)
+        # turn into tokens: int64 0/1, shape (N, 784)
+        self.seq = torch.from_numpy(data).round().to(torch.long)
+
+        self.targets = None
+        if with_labels:
+            from torchvision.datasets import MNIST
+            labels_root = labels_root or root
+            mnist_train = MNIST(labels_root, train=True, download=True)
+            mnist_test = MNIST(labels_root, train=False, download=True)
+
+            if split == "train":
+                targets = mnist_train.targets[:-val_from_train]
+            elif split == "valid":
+                targets = mnist_train.targets[-val_from_train:]
+            elif split == "test":
+                targets = mnist_test.targets
+            else:
+                raise ValueError(split)
+
+            self.targets = targets.to(torch.long)
+
+            if len(self.targets) != len(self.seq):
+                raise RuntimeError(
+                    f"Label length mismatch split={split}: data={len(self.seq)} vs labels={len(self.targets)}. "
+                    f"Your split alignment assumption may be wrong."
+                )
 
     def __len__(self):
-        return self.data.size(0)
+        return self.seq.size(0)
+
+    def __getitem__(self, idx):
+        seq = self.seq[idx]            # (784,) long in {0,1}
+        if self.targets is None:
+            # 如果你真的沒 label，先給 dummy label（見路線2），但這只會讓 loss 沒意義
+            cls = torch.tensor(0, dtype=torch.long)
+        else:
+            cls = self.targets[idx]    # scalar long 0..9
+        return seq, cls
 
 class EnhancerDataset(torch.utils.data.Dataset):
     def __init__(self, args, split='train'):
