@@ -54,8 +54,8 @@ elif args.dataset_type == 'enhancer':
 elif args.dataset_type == 'bmnist':
     from torchvision import datasets, transforms
     transform = transforms.Compose([transforms.ToTensor()])
-    train_ds = datasets.MNIST('data', train=True, download=False, transform=transform)
-    val_ds = datasets.MNIST('data', train=False, download=False, transform=transform)
+    train_ds = datasets.MNIST('data', train=True, download=True, transform=transform)
+    val_ds = datasets.MNIST('data', train=False, download=True, transform=transform)
     toy_data = None
 
 if args.dataset_type in ['toy_fixed', 'toy_sampled', 'enhancer']:
@@ -66,11 +66,7 @@ elif args.dataset_type == 'bmnist':
     # get loaders with transform
     train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, drop_last=True)
     val_loader = torch.utils.data.DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, drop_last=True)
-
-    test_loader = torch.utils.data.DataLoader(datasets.MNIST('data', train=False, download=False, transform=transform),
-                                                batch_size=args.batch_size, shuffle=False, drop_last=True)
-    # train_ds = BinaryMNIST(root='data/bmnist/', split='train')
-    # val_ds = BinaryMNIST(root='data/bmnist/', split='valid')
+    # test_loader = torch.utils.data.DataLoader(datasets.MNIST('data', train=False, download=False, transform=transform), batch_size=args.batch_size, shuffle=False, drop_last=True)
     toy_data = None
 
 
