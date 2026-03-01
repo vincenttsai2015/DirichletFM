@@ -14,7 +14,7 @@ class BinaryMNIST(torch.utils.data.Dataset):
     data_url = "http://www.cs.toronto.edu/~larocheh/public/datasets/binarized_mnist/binarized_mnist_{}.amat"
 
     def __init__(self, root, split, with_labels=True, 
-                 labels_root='data', val_from_train=5000):
+                 labels_root='data', val_from_train=10000):
         super().__init__()
         self.root = root
         self.split = split
