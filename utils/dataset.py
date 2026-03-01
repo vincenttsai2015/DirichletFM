@@ -31,6 +31,7 @@ class BinaryMNIST(torch.utils.data.Dataset):
         data = np.loadtxt(path).astype(np.float32)
         # turn into tokens: int64 0/1, shape (N, 784)
         self.seq = torch.from_numpy(data).round().to(torch.long)
+        print(f'Loaded {split} set with shape {self.seq.shape}.')
 
         self.targets = None
         if with_labels:
@@ -49,6 +50,7 @@ class BinaryMNIST(torch.utils.data.Dataset):
                 raise ValueError(split)
 
             self.targets = targets.to(torch.long)
+            print(f'Loaded {split} labels with shape {self.targets.shape}.')
 
             if len(self.targets) != len(self.seq):
                 raise RuntimeError(
