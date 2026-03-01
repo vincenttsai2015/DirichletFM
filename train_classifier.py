@@ -1,5 +1,5 @@
 from lightning_modules.cls_module import CLSModule
-from utils.dataset import ToyDataset, TwoClassOverfitDataset, EnhancerDataset
+from utils.dataset import ToyDataset, TwoClassOverfitDataset, EnhancerDataset, BinaryMNIST
 from utils.parsing import parse_train_args
 
 args = parse_train_args()
@@ -51,9 +51,13 @@ elif args.dataset_type == 'enhancer':
     train_ds = EnhancerDataset(args, split='train')
     val_ds = EnhancerDataset(args, split='valid' if not args.validate_on_test else 'test')
     toy_data = None
+elif args.dataset_type == 'bmnist':
+    train_ds = BinaryMNIST(root='data/bmnist/', split='train')
+    val_ds = BinaryMNIST(root='data/bmnist/', split='valid')
+    toy_data = None
 
-train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=args.dataset_type == 'enhancer')
-val_loader = torch.utils.data.DataLoader(val_ds, batch_size=args.batch_size, num_workers=args.num_workers)
+train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=True)
+val_loader = torch.utils.data.DataLoader(val_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False)
 model = CLSModule(args, alphabet_size=train_ds.alphabet_size, num_cls=train_ds.num_cls)
 
 if args.validate:

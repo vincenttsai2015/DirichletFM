@@ -25,6 +25,9 @@ We provide the weights of trained models for all experiments (if required). Unzi
 https://publbuck.s3.us-east-2.amazonaws.com/workdir.zip
 ```
 
+## MNIST 
+```python -m train_classifier --run_name MNIST_diri_fm --dataset_type bmnist --limit_val_batches 1000 --val_check_interval 5000 --batch_size 512 --cls_model cnn --print_freq 100 --wandb```
+
 ## Toy experiments
 The commands below are for linear flow matching (mode riemannian) and dirichlet flow matching. K in the paper corresponds to `--toy_simplex_dim` here.
 ```yaml
@@ -59,18 +62,13 @@ python -m train_promo --run_name linear_flow_matching --batch_size 128 --wandb -
 
 
 ## Enhancer design Experiments
-
 Download the dataset from https://zenodo.org/records/10184648 and place it into `data` to have the path `data/the_code/...`
-
-
 The following is an example command for training to then carry out the classifier free guidance experiments:
-
 ```yaml
 python -m train_dna --run_name train_FB_dirichlet_fm_cfguidance3 --batch_size 256 --print_freq 200 --wandb --dataset_type enhancer --num_integration_steps 100 --model cnn --num_cnn_stacks 4 --cls_free_guidance --guidance_scale 3 --clean_cls_ckpt_hparams workdir/clsDNAclean_cnn_1stack_2023-12-30_15-01-30/lightning_logs/version_0/hparams.yaml --clean_cls_ckpt workdir/clsDNAclean_cnn_1stack_2023-12-30_15-01-30/epoch=15-step=10480.ckpt --target_class 2 --check_val_every_n_epoch 10 --subset_train_as_val --allow_nan_cfactor --all_class_inference --probability_addition --fid_early_stop
 ```
 
 Here are the commands for Table 2. MEL corresponds to the melanoma data and FB to the flybrain data
-
 ```yaml
 python -m train_dna --run_name FB_dirichlet_fm_cfguidance3 --batch_size 256 --print_freq 200 --wandb --dataset_type enhancer --num_integration_steps 100 --model cnn --num_cnn_stacks 4 --cls_free_guidance --guidance_scale 3 --clean_cls_ckpt_hparams workdir/clsDNAclean_cnn_1stack_2023-12-30_15-01-30/lightning_logs/version_0/hparams.yaml --clean_cls_ckpt workdir/clsDNAclean_cnn_1stack_2023-12-30_15-01-30/epoch=15-step=10480.ckpt --target_class 2 --check_val_every_n_epoch 10 --subset_train_as_val --allow_nan_cfactor --all_class_inference --probability_addition --fid_early_stop --validate --validate_on_test --ckpt workdir/DNA_valOnTrain_epoch12Eval_uncondFID_FIDearlyS_probAddGuidance3_2024-01-07_16-23-01/epoch=1329-step=436240.ckpt
 
@@ -97,7 +95,6 @@ python -m train_dna --run_name MEL_dirichlet_fm_distilled --batch_size 256 --pri
 ```
 
 Here are the commands for class conditioned classifier free guidance experiments (vary the `--guidance_scale` for changing gamma and `--target_class` for the different target classes). The classes we used are (35, 2, 68, 16):
-
 ```yaml
 python -m train_dna --run_name dirichlet_fm_no_guidance --batch_size 256 --print_freq 200 --wandb --dataset_type enhancer --num_integration_steps 100 --model cnn --num_cnn_stacks 4 --clean_cls_ckpt_hparams workdir/clsDNAclean_cnn_1stack_2023-12-30_15-01-30/lightning_logs/version_0/hparams.yaml --clean_cls_ckpt workdir/clsDNAclean_cnn_1stack_2023-12-30_15-01-30/epoch=15-step=10480.ckpt --target_class 2 --check_val_every_n_epoch 10 --subset_train_as_val --mode dirichlet --fid_early_stop --max_epochs 1 --validate --validate_on_test --ckpt workdir/DNA_diri_target2_valOnTrain_noDropoutEval_2024-01-08_10-11-25/epoch=739-step=242720.ckpt
 
