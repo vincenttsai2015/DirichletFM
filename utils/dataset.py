@@ -28,6 +28,7 @@ class BinaryMNIST(torch.utils.data.Dataset):
             print(f'Downloading {split} set...')
             urlretrieve(self.data_url.format(split), data_path)
         self.data = torch.from_numpy(np.loadtxt(data_path).astype(np.float32))
+        print(self.data.shape)
 
     def __getitem__(self, index):
         x = self.data[index]
