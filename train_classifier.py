@@ -52,12 +52,28 @@ elif args.dataset_type == 'enhancer':
     val_ds = EnhancerDataset(args, split='valid' if not args.validate_on_test else 'test')
     toy_data = None
 elif args.dataset_type == 'bmnist':
-    train_ds = BinaryMNIST(root='data/bmnist/', split='train')
-    val_ds = BinaryMNIST(root='data/bmnist/', split='valid')
+    from torchvision import datasets, transforms
+    transform = transforms.Compose([transforms.ToTensor()])
+    train_ds = datasets.MNIST('data', train=True, download=False, transform=transform)
+    val_ds = datasets.MNIST('data', train=False, download=False, transform=transform)
     toy_data = None
 
-train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=True)
-val_loader = torch.utils.data.DataLoader(val_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False)
+if args.dataset_type in ['toy_fixed', 'toy_sampled', 'enhancer']:
+    train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=True)
+    val_loader = torch.utils.data.DataLoader(val_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False)
+
+elif args.dataset_type == 'bmnist':
+    # get loaders with transform
+    train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, drop_last=True)
+    val_loader = torch.utils.data.DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, drop_last=True)
+
+    test_loader = torch.utils.data.DataLoader(datasets.MNIST('data', train=False, download=False, transform=transform),
+                                                batch_size=args.batch_size, shuffle=False, drop_last=True)
+    # train_ds = BinaryMNIST(root='data/bmnist/', split='train')
+    # val_ds = BinaryMNIST(root='data/bmnist/', split='valid')
+    toy_data = None
+
+
 model = CLSModule(args, alphabet_size=train_ds.alphabet_size, num_cls=train_ds.num_cls)
 
 if args.validate:
