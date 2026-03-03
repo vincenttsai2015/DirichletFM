@@ -55,7 +55,6 @@ class CLSModule(GeneralModule):
 
     def general_step(self, batch, batch_idx=None):
         self.iter_step += 1
-        print(f'batch: {batch[0].shape}')
         seq, cls = batch
         cls = cls.squeeze()
         B, L = seq.shape
