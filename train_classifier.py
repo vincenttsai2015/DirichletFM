@@ -60,10 +60,12 @@ elif args.dataset_type == 'bmnist':
     val_ds = BinaryMNIST(root='data/bmnist/', split='valid')
     toy_data = None
 
-if args.dataset_type in ['toy_fixed', 'toy_sampled', 'enhancer']:
+if args.dataset_type == 'enhancer':
     train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=True)
     val_loader = torch.utils.data.DataLoader(val_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False)
-
+elif args.dataset_type in ['toy_fixed', 'toy_sampled']:
+    train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False)
+    val_loader = torch.utils.data.DataLoader(val_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=False)
 elif args.dataset_type == 'bmnist':
     # get loaders with transform
     train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, drop_last=True)
