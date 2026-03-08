@@ -6,11 +6,12 @@ from model.promoter_model import GaussianFourierProjection, Dense
 
 
 class MLPModel(nn.Module):
-    def __init__(self, args, alphabet_size, num_cls, classifier=False):
+    def __init__(self, args, alphabet_size, num_cls, classifier=False, cls_free_guidance=False):
         super().__init__()
         self.alphabet_size = alphabet_size
         self.classifier = classifier
         self.num_cls = num_cls
+        self.cls_free_guidance = cls_free_guidance
 
         self.time_embedder = nn.Sequential(GaussianFourierProjection(embed_dim=args.hidden_dim),nn.Linear(args.hidden_dim, args.hidden_dim))
         self.embedder = nn.Linear((1 if classifier and not args.cls_expanded_simplex else 2) * self.alphabet_size,  args.hidden_dim)
@@ -29,11 +30,11 @@ class MLPModel(nn.Module):
             self.cls_embedder = nn.Embedding(num_embeddings=self.num_cls + 1, embedding_dim=args.hidden_dim)
 
 
-    def forward(self, seq,t, cls=None):
+    def forward(self, seq, t, cls=None):
         time_embed = self.time_embedder(t)
         feat = self.embedder(seq)
         feat = feat + time_embed[:,None,:]
-        if self.args.cls_free_guidance and not self.classifier:
+        if self.cls_free_guidance and not self.classifier:
             feat = feat + self.cls_embedder(cls)[:, None, :]
         feat = self.mlp(feat)
         if self.classifier:
