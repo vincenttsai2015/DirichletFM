@@ -12,8 +12,7 @@ class MLPModel(nn.Module):
         self.classifier = classifier
         self.num_cls = num_cls
 
-
-        self.time_embedder = nn.Sequential(GaussianFourierProjection(embed_dim= args.hidden_dim),nn.Linear(args.hidden_dim, args.hidden_dim))
+        self.time_embedder = nn.Sequential(GaussianFourierProjection(embed_dim=args.hidden_dim),nn.Linear(args.hidden_dim, args.hidden_dim))
         self.embedder = nn.Linear((1 if classifier and not args.cls_expanded_simplex else 2) * self.alphabet_size,  args.hidden_dim)
         self.mlp = nn.Sequential(
             nn.Linear(args.hidden_dim, args.hidden_dim),
@@ -26,7 +25,7 @@ class MLPModel(nn.Module):
             self.cls_head = nn.Sequential(nn.Linear(args.hidden_dim, args.hidden_dim),
                                    nn.ReLU(),
                                    nn.Linear(args.hidden_dim, self.num_cls))
-        if self.args.cls_free_guidance and not self.classifier:
+        if args.cls_free_guidance and not self.classifier:
             self.cls_embedder = nn.Embedding(num_embeddings=self.num_cls + 1, embedding_dim=args.hidden_dim)
 
 
