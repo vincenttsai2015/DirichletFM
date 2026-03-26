@@ -86,7 +86,12 @@ if __name__ == "__main__":
     print('ab_proj2', ab_proj2)
 
 def sample_cond_prob_path(args, seq, alphabet_size):
-    B, L = seq.shape
+    if seq.dim() == 3:
+        B, L, K = seq.shape
+    elif seq.dim() == 2:
+        B, L = seq.shape
+        # K = self.model.alphabet_size
+        # seq = torch.nn.functional.one_hot(seq, num_classes=K).float()
     seq_one_hot = torch.nn.functional.one_hot(seq, num_classes=alphabet_size)
     if args.mode == 'dirichlet':
         alphas = torch.from_numpy(1 + scipy.stats.expon().rvs(size=B) * args.alpha_scale).to(seq.device).float()
