@@ -31,7 +31,7 @@ class BinaryMNIST(Dataset):
         img = img.squeeze(0) # (28, 28)
         # img = torch.stack([img, 1 - img], dim=-1)  # (H, W, 2)
         if self.flatten:
-            img = img.view(-1, 2)  # (H*W, 2)
+            img = img.reshape(img.shape[0] * img.shape[1])  # (H*W, 2)
         return img, label
 
 class EnhancerDataset(torch.utils.data.Dataset):
