@@ -88,7 +88,8 @@ if __name__ == "__main__":
 def sample_cond_prob_path(args, seq, alphabet_size):
     if seq.dim() == 3:
         B, L, K = seq.shape
-        seq_one_hot = torch.nn.functional.one_hot(seq.long(), num_classes=alphabet_size).float()
+        seq_one_hot = seq.float()
+        # seq_one_hot = torch.nn.functional.one_hot(seq.long(), num_classes=alphabet_size).float()
     elif seq.dim() == 2:
         B, L = seq.shape
         K = alphabet_size
