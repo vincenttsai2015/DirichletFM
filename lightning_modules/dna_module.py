@@ -93,6 +93,7 @@ class DNAModule(GeneralModule):
         else:
             cls_inp = None
         logits = self.model(xt_inp, t=alphas, cls=cls_inp)
+        print(f'logits.shape: {logits.shape}, seq.shape: {seq.shape}')
 
         losses = torch.nn.functional.cross_entropy(logits.transpose(1, 2), seq_distill if self.args.mode == 'distill' else seq, reduction='none')
         losses = losses.mean(-1)
