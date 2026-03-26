@@ -52,12 +52,12 @@ elif args.dataset_type == 'enhancer':
     val_ds = EnhancerDataset(args, split='valid' if not args.validate_on_test else 'test')
     toy_data = None
 elif args.dataset_type == 'bmnist':
-    # from torchvision import datasets, transforms
-    # transform = transforms.Compose([transforms.ToTensor()])
+    train_indices = list(range(50000))
+    val_indices = list(range(50000, 60000))
     # train_ds = datasets.MNIST('data', train=True, download=True, transform=transform)
     # val_ds = datasets.MNIST('data', train=False, download=True, transform=transform)
-    train_ds = BinaryMNIST(root='data/bmnist/', split='train')
-    val_ds = BinaryMNIST(root='data/bmnist/', split='valid')
+    train_ds = BinaryMNIST(root='./data', split='train', indices=train_indices, flatten=True)
+    val_ds = BinaryMNIST(root='./data', split='valid', indices=val_indices, flatten=True)
     toy_data = None
 
 if args.dataset_type == 'enhancer':
