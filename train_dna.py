@@ -57,8 +57,8 @@ elif args.dataset_type == 'bmnist':
     val_indices = list(range(50000, 60000))
     # train_ds = datasets.MNIST('data', train=True, download=True, transform=transform)
     # val_ds = datasets.MNIST('data', train=False, download=True, transform=transform)
-    train_ds = BinaryMNIST(root='./data', split='train', indices=train_indices, flatten=False)
-    val_ds = BinaryMNIST(root='./data', split='valid', indices=val_indices, flatten=False)
+    train_ds = BinaryMNIST(root='./data', split='train', indices=train_indices, flatten=True)
+    val_ds = BinaryMNIST(root='./data', split='valid', indices=val_indices, flatten=True)
     toy_data = None
 
 if args.subset_train_as_val:
