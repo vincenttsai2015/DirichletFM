@@ -27,11 +27,11 @@ class BinaryMNIST(Dataset):
     def __getitem__(self, idx):
         real_idx = self.indices[idx]
         img, label = self.base_dataset[real_idx]   # 這裡拿到的是 PIL image
-        img = self.transform(img)
+        img = self.transform(img) # (1, 28, 28), binary tensor
         img = img.squeeze(0) # (28, 28)
         # img = torch.stack([img, 1 - img], dim=-1)  # (H, W, 2)
         if self.flatten:
-            img = img.reshape(img.shape[0] * img.shape[1])  # (H*W, 2)
+            img = img.reshape(img.shape[0] * img.shape[1]).long()  # (H*W, )
         return img, label
 
 class EnhancerDataset(torch.utils.data.Dataset):
