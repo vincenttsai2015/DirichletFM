@@ -57,8 +57,13 @@ class CLSModule(GeneralModule):
         self.iter_step += 1
         seq, cls = batch
         cls = cls.squeeze()
-        B, L = seq.shape
-
+        if seq.dim() == 3:
+            B, L, K = seq.shape
+        elif seq.dim() == 2:
+            B, L = seq.shape
+            # K = self.model.alphabet_size
+            # seq = torch.nn.functional.one_hot(seq, num_classes=K).float()
+        
         xt, alphas = sample_cond_prob_path(self.args, seq, self.model.alphabet_size)
         xt_inp = xt
         if self.args.cls_expanded_simplex:
