@@ -65,7 +65,11 @@ class DNAModule(GeneralModule):
     def general_step(self, batch, batch_idx=None):
         self.iter_step += 1
         seq, cls = batch
-        B, L = seq.shape
+        if seq.dim() == 3:
+            B, L, K = seq.shape
+        elif seq.dim() == 2:
+            B, L = seq.shape
+            K = self.model.alphabet_size
 
         xt, alphas = sample_cond_prob_path(self.args, seq, self.model.alphabet_size)
         if self.args.mode == 'distill':
@@ -134,17 +138,23 @@ class DNAModule(GeneralModule):
 
     @torch.no_grad()
     def distill_inference(self, seq):
-        B, L = seq.shape
-        K = self.model.alphabet_size
+        if seq.dim() == 3:
+            B, L, K = seq.shape
+        elif seq.dim() == 2:
+            B, L = seq.shape
+            K = self.model.alphabet_size
         x0 = torch.distributions.Dirichlet(torch.ones(B, L, K, device=seq.device)).sample()
         logits = self.model(x0, t=torch.zeros(B, device=self.device))
         return logits
 
     @torch.no_grad()
     def dirichlet_flow_inference(self, seq, cls, model, args):
-        B, L = seq.shape
-        K = model.alphabet_size
-        x0 = torch.distributions.Dirichlet(torch.ones(B, L, model.alphabet_size, device=seq.device)).sample()
+        if seq.dim() == 3:
+            B, L, K = seq.shape
+        elif seq.dim() == 2:
+            B, L = seq.shape
+            K = model.alphabet_size
+        x0 = torch.distributions.Dirichlet(torch.ones(B, L, K, device=seq.device)).sample()
         eye = torch.eye(K).to(x0)
         xt = x0.clone()
 
@@ -216,8 +226,12 @@ class DNAModule(GeneralModule):
 
     @torch.no_grad()
     def riemannian_flow_inference(self, seq):
-        B, L = seq.shape
-        K = self.model.alphabet_size
+        if seq.dim() == 3:
+            B, L, K = seq.shape
+        elif seq.dim() == 2:
+            B, L = seq.shape
+            K = self.model.alphabet_size
+
         xt = torch.distributions.Dirichlet(torch.ones(B, L, K)).sample().to(self.device)
         eye = torch.eye(K).to(self.device)
 
