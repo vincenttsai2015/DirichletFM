@@ -28,9 +28,7 @@ class BinaryMNIST(Dataset):
         real_idx = self.indices[idx]
         img, label = self.base_dataset[real_idx]   # 這裡拿到的是 PIL image
         img = self.transform(img)
-        print(f'img.shape after transform: {img.shape}')  # (1, H, W)
         img = torch.stack([img, 1 - img], dim=-1)  # (H, W, 2)
-        print(f'img.shape after one-hot encoding: {img.shape}')  # (H, W, 2)
         if self.flatten:
             img = img.view(-1, 2)  # (H*W, 2)
         return img, label
@@ -109,8 +107,8 @@ class ToyDataset(torch.utils.data.IterableDataset):
                 seq.append(torch.multinomial(replacement=True,num_samples=1,input=self.probs[cls,i,:]))
             yield torch.tensor(seq), cls
 
-if __name__ == '__main__':
-    train_dataset = BinaryMNIST(root='./data', split='train', flatten=False)
-    for i in range(10):
-        img, label = train_dataset[i]
-        print(f'img.shape: {img.shape}, label: {label}')
+# if __name__ == '__main__':
+#     train_dataset = BinaryMNIST(root='./data', split='train', flatten=False)
+#     for i in range(10):
+#         img, label = train_dataset[i]
+#         print(f'img.shape: {img.shape}, label: {label}')
