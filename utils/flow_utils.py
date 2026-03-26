@@ -88,11 +88,12 @@ if __name__ == "__main__":
 def sample_cond_prob_path(args, seq, alphabet_size):
     if seq.dim() == 3:
         B, L, K = seq.shape
+        seq_one_hot = torch.nn.functional.one_hot(seq.long(), num_classes=alphabet_size).float()
     elif seq.dim() == 2:
         B, L = seq.shape
-        # K = self.model.alphabet_size
-        # seq = torch.nn.functional.one_hot(seq, num_classes=K).float()
-    seq_one_hot = torch.nn.functional.one_hot(seq, num_classes=alphabet_size)
+        K = alphabet_size
+        seq_one_hot = torch.nn.functional.one_hot(seq, num_classes=K).float()
+    
     if args.mode == 'dirichlet':
         alphas = torch.from_numpy(1 + scipy.stats.expon().rvs(size=B) * args.alpha_scale).to(seq.device).float()
         if args.fix_alpha:
