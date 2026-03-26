@@ -28,7 +28,7 @@ class BinaryMNIST(Dataset):
         real_idx = self.indices[idx]
         img, label = self.base_dataset[real_idx]   # 這裡拿到的是 PIL image
         img = self.transform(img)
-        img = torch.stack([img, 1 - img], dim=-1)  # (H, W, 2)
+        # img = torch.stack([img, 1 - img], dim=-1)  # (H, W, 2)
         if self.flatten:
             img = img.view(-1, 2)  # (H*W, 2)
         return img, label
