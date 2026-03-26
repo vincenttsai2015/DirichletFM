@@ -65,6 +65,7 @@ class DNAModule(GeneralModule):
     def general_step(self, batch, batch_idx=None):
         self.iter_step += 1
         seq, cls = batch
+        print(f'seq.shape: {seq.shape}, cls.shape: {cls.shape}')
         if seq.dim() == 3:
             B, L, K = seq.shape
         elif seq.dim() == 2:
